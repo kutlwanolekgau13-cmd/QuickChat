@@ -8,6 +8,7 @@ package registrationlogin;
  *
  * @author Student
  */
+// Unit tests for the Message class, using the test data from the brief
 public class MessageTest {
     
 }
