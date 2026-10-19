@@ -1,3 +1,4 @@
+# Runs the unit tests on every push
 name: Java CI with Maven
 
 on:
