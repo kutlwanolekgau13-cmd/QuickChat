@@ -16,7 +16,7 @@ public class Message {
 
     private static final List<Message> messages = new ArrayList<>();
     private static int totalMessagesSent = 0;
-
+// Message class for QuickChat: holds one message and checks its ID, recipient, length and hash
     public Message(String messageID, int numMessagesSent,
                    String recipient, String message) {
         this.messageID = messageID;
