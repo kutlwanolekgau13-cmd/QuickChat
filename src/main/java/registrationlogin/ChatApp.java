@@ -2,7 +2,7 @@ package registrationlogin;
 
 import java.util.Random;
 import java.util.Scanner;
-
+// ChatApp: registers and logs in the user, then runs the QuickChat menu
 public class ChatApp {
 
     public static void main(String[] args) {
