@@ -2,7 +2,9 @@ package registrationlogin;
 
 import java.util.Random;
 import java.util.Scanner;
+import java.util.List;
 // ChatApp: registers and logs in the user, then runs the QuickChat menu
+
 public class ChatApp {
 
     public static void main(String[] args) {
@@ -51,6 +53,13 @@ public class ChatApp {
         }
 
         System.out.println("Welcome to QuickChat.");
+
+        // Part 3: read messages.json into the stored array and show what was loaded
+        System.out.println(Message.loadStoredMessages());
+        List<String> stored = Message.getStoredMessages();
+        for (int i = 0; i < stored.size(); i++) {
+            System.out.println((i + 1) + ") " + stored.get(i));
+        }
 
         // the user decides how many messages they will enter
         System.out.println("How many messages do you wish to enter?");

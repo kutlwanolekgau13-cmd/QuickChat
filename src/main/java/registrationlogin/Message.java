@@ -4,6 +4,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.io.File;
+import java.io.FileReader;
+import java.lang.reflect.Type;
 
 public class Message {
 
@@ -281,5 +286,45 @@ public class Message {
         messageHashes.clear();
         recipients.clear();
         messageTexts.clear();
+    }
+
+    // Reads messages.json into the stored array and the parallel arrays.
+    // Source: Gson library, https://github.com/google/gson
+    // (replace this line with the exact page or tutorial you used)
+    public static String loadStoredMessages() {
+        File file = new File("messages.json");
+        if (!file.exists()) {
+            return "No stored messages found.";
+        }
+
+        try (FileReader reader = new FileReader(file)) {
+            Type listType = new TypeToken<List<StoredRecord>>() {
+            }.getType();
+            List<StoredRecord> records = new Gson().fromJson(reader, listType);
+
+            if (records == null || records.isEmpty()) {
+                return "No stored messages found.";
+            }
+
+            for (StoredRecord record : records) {
+                storedMessages.add(record.message);
+                messageIDs.add(record.messageID);
+                messageHashes.add(record.messageHash);
+                recipients.add(record.recipient);
+                messageTexts.add(record.message);
+            }
+            return records.size() + " stored message(s) loaded.";
+        } catch (Exception e) {
+            return "Error reading stored messages: " + e.getMessage();
+        }
+    }
+
+    // Shape of one record in messages.json (the field names match the JSON keys)
+    private static class StoredRecord {
+
+        String messageID;
+        String messageHash;
+        String recipient;
+        String message;
     }
 }
