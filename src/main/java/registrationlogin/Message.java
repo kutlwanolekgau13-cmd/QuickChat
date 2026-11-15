@@ -296,7 +296,7 @@ public class Message {
 
     // Reads messages.json into the stored array and the parallel arrays.
     // Source: Gson library, https://github.com/google/gson
-    // (replace this line with the exact page or tutorial you used)
+    // Gson user guide (Collections section): https://github.com/google/gson/blob/main/UserGuide.md
     public static String loadStoredMessages() {
         File file = new File(storageFile);
         if (!file.exists()) {
