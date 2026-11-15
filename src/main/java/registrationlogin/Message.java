@@ -32,6 +32,7 @@ public class Message {
     private static final List<String> recipients = new ArrayList<>();
     private static final List<String> messageTexts = new ArrayList<>();
     private static final List<String> messageFlags = new ArrayList<>();
+    private static String storageFile = "messages.json";
 
     public Message(String messageID, int numMessagesSent,
             String recipient, String message) {
@@ -152,7 +153,7 @@ public class Message {
     public String storeMessage() {
         List<String> records = new ArrayList<>();
 
-        java.io.File file = new java.io.File("messages.json");
+        java.io.File file = new java.io.File(storageFile);
 
         // Read existing JSON records.
         if (file.exists()) {
@@ -289,13 +290,15 @@ public class Message {
         recipients.clear();
         messageTexts.clear();
         messageFlags.clear();
+        messages.clear();
+        totalMessagesSent = 0;
     }
 
     // Reads messages.json into the stored array and the parallel arrays.
     // Source: Gson library, https://github.com/google/gson
     // (replace this line with the exact page or tutorial you used)
     public static String loadStoredMessages() {
-        File file = new File("messages.json");
+        File file = new File(storageFile);
         if (!file.exists()) {
             return "No stored messages found.";
         }
@@ -441,7 +444,7 @@ public class Message {
             }
         }
 
-        try (FileWriter writer = new FileWriter("messages.json", false)) {
+        try (FileWriter writer = new FileWriter(storageFile, false)) {
             new Gson().toJson(records, writer);
         } catch (IOException e) {
             System.out.println("Error updating stored messages: " + e.getMessage());
@@ -465,5 +468,10 @@ public class Message {
             return "No " + flag.toLowerCase() + " messages.";
         }
         return report.toString();
+    }
+
+    // Lets the unit tests use their own file so the real messages.json is never touched
+    public static void setStorageFile(String path) {
+        storageFile = path;
     }
 }
