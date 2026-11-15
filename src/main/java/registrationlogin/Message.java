@@ -31,6 +31,7 @@ public class Message {
     private static final List<String> messageHashes = new ArrayList<>();
     private static final List<String> recipients = new ArrayList<>();
     private static final List<String> messageTexts = new ArrayList<>();
+    private static final List<String> messageFlags = new ArrayList<>();
 
     public Message(String messageID, int numMessagesSent,
             String recipient, String message) {
@@ -106,17 +107,17 @@ public class Message {
             case "send":
                 messages.add(this);
                 totalMessagesSent++;
-                recordMessage(sentMessages);
+                recordMessage(sentMessages,"Sent");
                 return "Message successfully sent.";
 
             case "discard":
-                recordMessage(disregardedMessages);
+                recordMessage(disregardedMessages,"Disregard");
                 return "Press 0 to delete the message.";
 
             case "store": {
                 String result = storeMessage();
                 if (result.equals("Message successfully stored.")) {
-                    recordMessage(storedMessages);
+                    recordMessage(storedMessages,"Stored");
                 }
                 return result;
             }
@@ -241,12 +242,13 @@ public class Message {
 
     // Adds this message to its category list and to every parallel list at once,
     // so the indexes always stay lined up
-    private void recordMessage(List<String> categoryList) {
+    private void recordMessage(List<String> categoryList, String flag) {
         categoryList.add(message);
         messageIDs.add(messageID);
         messageHashes.add(messageHash);
         recipients.add(recipient);
         messageTexts.add(message);
+        messageFlags.add(flag);
     }
 
     public static List<String> getSentMessages() {
@@ -286,6 +288,7 @@ public class Message {
         messageHashes.clear();
         recipients.clear();
         messageTexts.clear();
+        messageFlags.clear();
     }
 
     // Reads messages.json into the stored array and the parallel arrays.
@@ -312,6 +315,7 @@ public class Message {
                 messageHashes.add(record.messageHash);
                 recipients.add(record.recipient);
                 messageTexts.add(record.message);
+                messageFlags.add("Stored");
             }
             return records.size() + " stored message(s) loaded.";
         } catch (Exception e) {
@@ -326,5 +330,52 @@ public class Message {
         String messageHash;
         String recipient;
         String message;
+    }
+
+    // a. Sender and recipient of all stored messages
+    public static String displaySenderAndRecipient(String sender) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < messageIDs.size(); i++) {
+            if (messageFlags.get(i).equals("Stored")) {
+                result.append("Sender: ").append(sender)
+                        .append(" | Recipient: ").append(recipients.get(i)).append("\n");
+            }
+        }
+        if (result.length() == 0) {
+            return "No stored messages.";
+        }
+        return result.toString();
+    }
+
+    // b. Longest stored message
+    public static String longestStoredMessage() {
+        String longest = "";
+        for (String text : storedMessages) {
+            if (text.length() > longest.length()) {
+                longest = text;
+            }
+        }
+        if (longest.isEmpty()) {
+            return "No stored messages.";
+        }
+        return longest;
+    }
+
+    // c. Search by message ID: returns the message text
+    public static String searchByMessageID(String id) {
+        int index = messageIDs.indexOf(id);
+        if (index == -1) {
+            return "Message ID not found.";
+        }
+        return messageTexts.get(index);
+    }
+
+    // c. The recipient that goes with that message ID
+    public static String getRecipientByMessageID(String id) {
+        int index = messageIDs.indexOf(id);
+        if (index == -1) {
+            return "Message ID not found.";
+        }
+        return recipients.get(index);
     }
 }

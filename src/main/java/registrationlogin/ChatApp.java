@@ -78,6 +78,7 @@ public class ChatApp {
             System.out.println("1) Send Messages");
             System.out.println("2) Show recently sent messages");
             System.out.println("3) Quit");
+            System.out.println("4) Stored Messages");
             choice = readNumber(scanner);
 
             if (choice == 1) {
@@ -155,12 +156,49 @@ public class ChatApp {
             } else if (choice == 3) {
                 System.out.println("Total number of messages sent: " + sentCount);
                 System.out.println("Goodbye.");
+            } else if (choice == 4) {
+                storedMessagesMenu(scanner, firstName + " " + lastName);
             } else {
-                System.out.println("Invalid option, please choose 1, 2 or 3.");
+                System.out.println("Invalid option, please choose 1, 2, 3 or 4.");
             }
         }
 
         scanner.close();
+    }
+
+    // Stored Messages sub-menu (Part 3)
+    private static void storedMessagesMenu(Scanner scanner, String sender) {
+        int option = 0;
+        while (option != 7) {
+            System.out.println("\nStored Messages:");
+            System.out.println("1) Display sender and recipient of all stored messages");
+            System.out.println("2) Display the longest stored message");
+            System.out.println("3) Search for a message ID");
+            System.out.println("4) Search for all messages to a recipient");
+            System.out.println("5) Delete a message using the message hash");
+            System.out.println("6) Display a report of all stored messages");
+            System.out.println("7) Back to the main menu");
+            option = readNumber(scanner);
+
+            if (option == 1) {
+                System.out.println(Message.displaySenderAndRecipient(sender));
+            } else if (option == 2) {
+                System.out.println(Message.longestStoredMessage());
+            } else if (option == 3) {
+                System.out.println("Enter the message ID:");
+                String id = scanner.nextLine().trim();
+                if (Message.getMessageIDs().contains(id)) {
+                    System.out.println("Recipient: " + Message.getRecipientByMessageID(id));
+                    System.out.println("Message: " + Message.searchByMessageID(id));
+                } else {
+                    System.out.println("Message ID not found.");
+                }
+            } else if (option >= 4 && option <= 6) {
+                System.out.println("Coming soon.");   // built in the next step
+            } else if (option != 7) {
+                System.out.println("Invalid option, please choose 1 to 7.");
+            }
+        }
     }
 
     // reads a whole line and turns it into a number, gives -1 if it is not a number
