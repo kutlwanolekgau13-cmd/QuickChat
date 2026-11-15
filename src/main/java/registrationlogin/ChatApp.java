@@ -2,7 +2,9 @@ package registrationlogin;
 
 import java.util.Random;
 import java.util.Scanner;
+import java.util.List;
 // ChatApp: registers and logs in the user, then runs the QuickChat menu
+
 public class ChatApp {
 
     public static void main(String[] args) {
@@ -52,6 +54,13 @@ public class ChatApp {
 
         System.out.println("Welcome to QuickChat.");
 
+        // Part 3: read messages.json into the stored array and show what was loaded
+        System.out.println(Message.loadStoredMessages());
+        List<String> stored = Message.getStoredMessages();
+        for (int i = 0; i < stored.size(); i++) {
+            System.out.println((i + 1) + ") " + stored.get(i));
+        }
+
         // the user decides how many messages they will enter
         System.out.println("How many messages do you wish to enter?");
         int numMessages = readNumber(scanner);
@@ -69,6 +78,7 @@ public class ChatApp {
             System.out.println("1) Send Messages");
             System.out.println("2) Show recently sent messages");
             System.out.println("3) Quit");
+            System.out.println("4) Stored Messages");
             choice = readNumber(scanner);
 
             if (choice == 1) {
@@ -146,12 +156,64 @@ public class ChatApp {
             } else if (choice == 3) {
                 System.out.println("Total number of messages sent: " + sentCount);
                 System.out.println("Goodbye.");
+            } else if (choice == 4) {
+                storedMessagesMenu(scanner, firstName + " " + lastName);
             } else {
-                System.out.println("Invalid option, please choose 1, 2 or 3.");
+                System.out.println("Invalid option, please choose 1, 2, 3 or 4.");
             }
         }
 
         scanner.close();
+    }
+
+    // Stored Messages sub-menu (Part 3)
+    private static void storedMessagesMenu(Scanner scanner, String sender) {
+        int option = 0;
+        while (option != 7) {
+            System.out.println("\nStored Messages:");
+            System.out.println("1) Display sender and recipient of all stored messages");
+            System.out.println("2) Display the longest stored message");
+            System.out.println("3) Search for a message ID");
+            System.out.println("4) Search for all messages to a recipient");
+            System.out.println("5) Delete a message using the message hash");
+            System.out.println("6) Display a report of all stored messages");
+            System.out.println("7) Back to the main menu");
+            option = readNumber(scanner);
+
+            if (option == 1) {
+                System.out.println(Message.displaySenderAndRecipient(sender));
+            } else if (option == 2) {
+                System.out.println(Message.longestStoredMessage());
+            } else if (option == 3) {
+                System.out.println("Enter the message ID:");
+                String id = scanner.nextLine().trim();
+                if (Message.getMessageIDs().contains(id)) {
+                    System.out.println("Recipient: " + Message.getRecipientByMessageID(id));
+                    System.out.println("Message: " + Message.searchByMessageID(id));
+                } else {
+                    System.out.println("Message ID not found.");
+                }
+            } else if (option == 4) {
+                System.out.println("Enter the recipient cell number:");
+                String recipient = scanner.nextLine().trim();
+                List<String> found = Message.searchByRecipient(recipient);
+                if (found.isEmpty()) {
+                    System.out.println("No messages found for " + recipient + ".");
+                } else {
+                    for (String text : found) {
+                        System.out.println("- " + text);
+                    }
+                }
+            } else if (option == 5) {
+                System.out.println("Enter the message hash:");
+                String hash = scanner.nextLine().trim().toUpperCase();
+                System.out.println(Message.deleteByHash(hash));
+            } else if (option == 6) {
+                System.out.println(Message.displayReport("Stored"));
+            } else if (option != 7) {
+                System.out.println("Invalid option, please choose 1 to 7.");
+            }
+        }
     }
 
     // reads a whole line and turns it into a number, gives -1 if it is not a number
