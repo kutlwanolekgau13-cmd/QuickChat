@@ -107,17 +107,17 @@ public class Message {
             case "send":
                 messages.add(this);
                 totalMessagesSent++;
-                recordMessage(sentMessages,"Sent");
+                recordMessage(sentMessages, "Sent");
                 return "Message successfully sent.";
 
             case "discard":
-                recordMessage(disregardedMessages,"Disregard");
+                recordMessage(disregardedMessages, "Disregard");
                 return "Press 0 to delete the message.";
 
             case "store": {
                 String result = storeMessage();
                 if (result.equals("Message successfully stored.")) {
-                    recordMessage(storedMessages,"Stored");
+                    recordMessage(storedMessages, "Stored");
                 }
                 return result;
             }
@@ -377,5 +377,93 @@ public class Message {
             return "Message ID not found.";
         }
         return recipients.get(index);
+    }
+
+    // d. All sent or stored messages for one recipient (disregarded ones are left out)
+    public static List<String> searchByRecipient(String recipient) {
+        List<String> found = new ArrayList<>();
+        for (int i = 0; i < recipients.size(); i++) {
+            if (recipients.get(i).equals(recipient)
+                    && !messageFlags.get(i).equals("Disregard")) {
+                found.add(messageTexts.get(i));
+            }
+        }
+        return found;
+    }
+
+    // e. Delete a message using its hash: removes the same index from every array
+    public static String deleteByHash(String hash) {
+        int index = messageHashes.indexOf(hash);
+        if (index == -1) {
+            return "Message hash not found.";
+        }
+
+        String text = messageTexts.get(index);
+        String flag = messageFlags.get(index);
+
+        // remove from the category list the message belongs to
+        if (flag.equals("Sent")) {
+            sentMessages.remove(text);
+            messages.removeIf(m -> m.messageHash.equals(hash));
+        } else if (flag.equals("Stored")) {
+            storedMessages.remove(text);
+        } else {
+            disregardedMessages.remove(text);
+        }
+
+        // remove from every parallel array so the indexes stay lined up
+        messageIDs.remove(index);
+        messageHashes.remove(index);
+        recipients.remove(index);
+        messageTexts.remove(index);
+        messageFlags.remove(index);
+
+        // a deleted stored message must also leave messages.json
+        if (flag.equals("Stored")) {
+            rewriteStoredFile();
+        }
+
+        return "Message: \"" + text + "\" successfully deleted.";
+    }
+
+    // Rewrites messages.json from the stored entries still in the arrays.
+    // Source: Gson library, https://github.com/google/gson
+    private static void rewriteStoredFile() {
+        List<StoredRecord> records = new ArrayList<>();
+        for (int i = 0; i < messageIDs.size(); i++) {
+            if (messageFlags.get(i).equals("Stored")) {
+                StoredRecord record = new StoredRecord();
+                record.messageID = messageIDs.get(i);
+                record.messageHash = messageHashes.get(i);
+                record.recipient = recipients.get(i);
+                record.message = messageTexts.get(i);
+                records.add(record);
+            }
+        }
+
+        try (FileWriter writer = new FileWriter("messages.json", false)) {
+            new Gson().toJson(records, writer);
+        } catch (IOException e) {
+            System.out.println("Error updating stored messages: " + e.getMessage());
+        }
+    }
+
+    // f. Report with the full details of every message with the given flag
+    //    ("Stored" for the menu report, "Sent" for the sent-messages report)
+    public static String displayReport(String flag) {
+        StringBuilder report = new StringBuilder();
+        for (int i = 0; i < messageIDs.size(); i++) {
+            if (messageFlags.get(i).equals(flag)) {
+                report.append("Message ID: ").append(messageIDs.get(i))
+                        .append("\nMessage Hash: ").append(messageHashes.get(i))
+                        .append("\nRecipient: ").append(recipients.get(i))
+                        .append("\nMessage: ").append(messageTexts.get(i))
+                        .append("\n\n");
+            }
+        }
+        if (report.length() == 0) {
+            return "No " + flag.toLowerCase() + " messages.";
+        }
+        return report.toString();
     }
 }

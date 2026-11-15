@@ -193,8 +193,23 @@ public class ChatApp {
                 } else {
                     System.out.println("Message ID not found.");
                 }
-            } else if (option >= 4 && option <= 6) {
-                System.out.println("Coming soon.");   // built in the next step
+            } else if (option == 4) {
+                System.out.println("Enter the recipient cell number:");
+                String recipient = scanner.nextLine().trim();
+                List<String> found = Message.searchByRecipient(recipient);
+                if (found.isEmpty()) {
+                    System.out.println("No messages found for " + recipient + ".");
+                } else {
+                    for (String text : found) {
+                        System.out.println("- " + text);
+                    }
+                }
+            } else if (option == 5) {
+                System.out.println("Enter the message hash:");
+                String hash = scanner.nextLine().trim().toUpperCase();
+                System.out.println(Message.deleteByHash(hash));
+            } else if (option == 6) {
+                System.out.println(Message.displayReport("Stored"));
             } else if (option != 7) {
                 System.out.println("Invalid option, please choose 1 to 7.");
             }
